@@ -12,11 +12,22 @@ The owner is usually not available while you work, so use your judgement, write 
 - You never edit `scope.md`.
 - `README.md` is written by agents. It reflects the current state of the repo, not its ambitions.
 - `spec/` holds detailed descriptions of tasks, designs and decisions. Write a spec whenever a task needs more than a line to explain.
-- `backlog.md` is a list of outstanding tasks. Each is a single named line that links to its description in `spec/`.
-- `progress.md` records finished work. When a task is done, move its line from `backlog.md` to `progress.md`, and add the relevant commits and agent logs.
+- `backlog.md` is a list of outstanding jobs, most important first. Each is a single named line that links to its description in `spec/`.
+- `progress.md` records finished work. When a job is done, move its line from `backlog.md` to the **Done** section of `progress.md`, and add the relevant commits and agent logs. Cancelled jobs go to its **Cancelled** section, with the reason.
+- `spec/state-of-project.md` is the latest reflection's assessment of the project against `scope.md`.
 - `BLOCKERS.md` is created only when something needs the owner's intervention.
 
 Commit changes to the task files along with the code they describe.
+
+## The Ralph loop
+
+The project is usually driven by `ralph/ralph.sh`, which runs a fresh, headless agent over and over.
+Each run is a **tick**.
+If you were started by the loop, your prompt will say so, and the rules in `ralph/tick.md` or `ralph/reflect.md` apply on top of this file.
+
+- A **tick** (`ralph/tick.md`) does the first open job in the backlog. It may add new jobs to the bottom, labelled `[ralph]`, but it may not delete, cancel or reorder other jobs.
+- A **reflection** (`ralph/reflect.md`) runs when no open jobs remain, and on every tenth tick. It does not do a job. It weighs the project against `scope.md`, revisits the reasoning behind each job in the session logs, cancels jobs that do not serve the goals, and rewrites the backlog and specs to set the course.
+- The loop stops when a reflection leaves no open jobs: either the project is finished, or everything left is `[blocked]` on the owner.
 
 ## Configuration
 
@@ -45,7 +56,7 @@ Commit changes to the task files along with the code they describe.
 
 Each session leaves a trail so the next agent can pick up where you left off.
 
-- Log each session to a timestamped file in `agent-logs/`, such as `agent-logs/2026-01-31T09-00.log`.
+- Log each session to a timestamped file in `agent-logs/`, such as `agent-logs/2026-01-31T09-00.log`. Ralph sessions add their kind and tick number, as in `agent-logs/2026-01-31T09-00-tick-3.log`.
 - Append to the log as you go: what you tried, what you learned, and why you chose what you chose.
 - Every time you make a commit, describe it carefully in the log.
 - At the end of a session, write a ten-line summary at the bottom of the log.
@@ -53,11 +64,15 @@ Each session leaves a trail so the next agent can pick up where you left off.
 
 ```json
 {
-  "log": "2026-01-31T09-00.log",
+  "log": "2026-01-31T09-00-tick-3.log",
+  "kind": "tick",
+  "tick": 3,
   "summary": "Built the data loader and its tests.",
   "commits": ["a1b2c3d", "e4f5a6b"]
 }
 ```
+
+Sessions started by hand use `"kind": "manual"` and leave out `"tick"`.
 
 To understand earlier sessions quickly, read the git history and cross-check it against `agent-logs/logs.json`, then the individual logs for the reasoning.
 
@@ -65,7 +80,7 @@ To understand earlier sessions quickly, read the git history and cross-check it 
 
 1. Record the error in your session log.
 2. Fix it if the solution is clear.
-3. If you are still stuck after three attempts, note the problem in `progress.md`, add it to `BLOCKERS.md` if it needs the owner, and move on to the next task.
+3. If you are still stuck after three attempts, label the job `[blocked]` in `backlog.md`, explain why in its spec, and add it to `BLOCKERS.md` if it needs the owner.
 
 ## Code quality
 

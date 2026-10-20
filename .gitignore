@@ -33,3 +33,6 @@ weights/
 *.pth
 *.safetensors
 *.onnx
+
+# Ralph loop state
+ralph/.state/

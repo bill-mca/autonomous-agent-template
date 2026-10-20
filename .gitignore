@@ -1,0 +1,35 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Agent and editor clutter
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
+.vscode/
+.idea/
+.DS_Store
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Node
+node_modules/
+
+# Data, outputs and model weights
+data/
+outputs/
+results/
+checkpoints/
+weights/
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+*.onnx
